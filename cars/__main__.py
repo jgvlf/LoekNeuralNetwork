@@ -5,37 +5,35 @@ inputs: list[tuple[float]] = [(0.0000, 0.0000), (0.1600, 0.1556), (0.2400, 0.354
 targets: list[int] = [230, 555, 815, 860, 1140, 1085, 1200, 1330, 1290,
                       870, 1545, 1480, 1750, 1845, 1790, 1955]
 
-w1: float = 0.1
-w2: float = 0.2
+weights: list[float] = [0.1, 0.2]
 b: float = 0.3
 epochs: int = 4000
 learning_rate: float = 0.1
 
 
-def predict(i1, i2):
-    return w1 * i1 + w2 * i2 + b
+def predict(inputs_data):
+    return sum([w * i for w, i in zip(weights, inputs_data)]) + b
 
 
 # train the network
 for epoch in range(epochs):
-    pred = [predict(i1, i2) for i1, i2 in inputs]
+    pred = [predict(inp) for inp in inputs]
     cost = sum([(p - t) ** 2 for p, t in zip(pred, targets)]) / len(targets)
     print(f"ep: {epoch}, c: {cost:.2f};")
 
     errors_d = [2 * (p - t) for p, t in zip(pred, targets)]
-    weight1_d = [e * i[0] for e, i in zip(errors_d, inputs)]
-    weight2_d = [e * i[1] for e, i in zip(errors_d, inputs)]
+    weights_d = [[e * i for i in inp] for e, inp in zip(errors_d, inputs)]
+    weights_d_T = list(zip(*weights_d))  # transpose weight_d
+    for i in range(len(weights)):
+        weights[i] -= learning_rate * sum(weights_d_T[i])/len(weights_d)
     bias_d = [e * 1 for e in errors_d]
-
-    w1 -= learning_rate * sum(weight1_d) / len(weight1_d)
-    w2 -= learning_rate * sum(weight2_d) / len(weight2_d)
     b -= learning_rate * sum(bias_d) / len(bias_d)
 
 test_inputs = [(0.1600, 0.1391), (0.5600, 0.3046),
     (0.7600, 0.8013), (0.9600, 0.3046), (0.1600, 0.7185)]
 test_targets = [500, 850, 1650, 950, 1375]
 
-pred = [predict(i1, i2) for i1, i2 in test_inputs]
+pred = [predict(inp) for inp in test_inputs]
 
 for p, t in zip(pred, test_targets):
     print(f"Targets: ${t}, Predicted: ${p:.0f}")
