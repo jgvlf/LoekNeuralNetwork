@@ -2,8 +2,8 @@ import data
 
 weights: list[list[float]] = [[0.1, 0.2], [0.15, 0.25], [0.18, 0.1]]
 biases: list[float] = [0.3, 0.4, 0.35]
-epochs: int = 100
-learning_rate: float = .2
+epochs: int = 5000
+learning_rate: float = .5   
 
 
 def softmax(predictions) -> list[float]:
