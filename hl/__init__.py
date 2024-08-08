@@ -1,4 +1,5 @@
 import data
+import random
 
 
 def softmax(predictions) -> list[float]:
@@ -17,11 +18,12 @@ def log_loss(activations, targets) -> int:
 
 epochs: int = 5000
 learning_rate: float = .3
+input_count, hidden_count, output_count = 2, 8, 3
 
-w_i_h: list[list[float]] = [[0.1, -0.2], [-0.3, 0.25], [0.12, 0.23], [-0.11, 0.22]]  # 4 hidden neurons
-w_h_o: list[list[float]] = [[0.2, 0.17, 0.3, -0.11], [0.3, -0.4, 0.5, -0.22], [0.12, 0.23, 0.15, 0.33]]
-b_i_h: list[float] = [0.2, 0.34, 0.21, 0.44]  # 4 hidden neurons
-b_h_o: list[float] = [0.3, 0.29, 0,37]  # 3 output neurons
+w_i_h: list[list[float]] = [[random.random() - 0.5 for _ in range(input_count)] for _ in range(hidden_count)]  # 4 hidden neurons
+w_h_o: list[list[float]] = [[random.random() - 0.5 for _ in range(hidden_count)] for _ in range(output_count)]
+b_i_h: list[float] = [0 for _ in range(hidden_count)]  # 4 hidden neurons
+b_h_o: list[float] = [0 for _ in range(output_count)]  # 3 output neurons
 
 for epoch in range(epochs):
     pred_h: list[list[float]] = [[sum([w * a for w, a in zip(weights, inp)])
@@ -56,14 +58,14 @@ for epoch in range(epochs):
 
     # Update weights and biases for all layers
     w_h_o_d_T: list[list[float]] = list(zip(*w_h_o_d))
-    for y in range(len(w_h_o_d_T)):
-        for x in range(len(w_h_o_d_T[0])):
+    for y in range(output_count):
+        for x in range(hidden_count):
             w_h_o[y][x] -= learning_rate * w_h_o_d_T[y][x] / len(data.inputs)
         b_h_o[y] -= learning_rate * b_h_o_d[y] / len(data.inputs)
 
     w_i_h_d_T: list[list[float]] = list(zip(*w_i_h_d))
-    for y in range(len(w_i_h_d_T)):
-        for x in range(len(w_i_h_d_T[0])):
+    for y in range(hidden_count):
+        for x in range(input_count):
             w_i_h[y][x] -= learning_rate * w_i_h_d_T[y][x] / len(data.inputs)
         b_i_h[y] -= learning_rate * b_i_h_d[y] / len(data.inputs)
 
